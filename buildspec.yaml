@@ -2,9 +2,9 @@ version: 0.2
 
 env:
   variables:
-    DOCKER_REGISTRY_URL: /my_app/docker-credentials/url
-    DOCKER_REGISTRY_USERNAME: /my_app/docker-credentials/username
-    DOCKER_REGISTRY_PASSWORD: /my_app/docker-credentials/password
+    DOCKER_REGISTRY_URL: "/my_app/docker-credentials/url"
+    DOCKER_REGISTRY_USERNAME: "/my_app/docker-credentials/username"
+    DOCKER_REGISTRY_PASSWORD: "/my_app/docker-credentials/password"
 
 phases:
   install:
