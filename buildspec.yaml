@@ -2,30 +2,27 @@ version: 0.2
 
 env:
   variables:
-  DOCKER_REGISTRY_URL: /my_app/docker-credentials/url
-  DOCKER_REGISTRY_USERNAME: /my_app/docker-credentials/username
-  DOCKER_REGISTRY_PASSWORD: /my_app/docker-credentials/password
-    
-
+    DOCKER_REGISTRY_URL: /my_app/docker-credentials/url
+    DOCKER_REGISTRY_USERNAME: /my_app/docker-credentials/username
+    DOCKER_REGISTRY_PASSWORD: /my_app/docker-credentials/password
 
 phases:
   install:
     runtime-versions:
-      python:3.8
-      
+      python: 3.8
+
   pre_build:
     commands:
-      - echo "installing dependencies"
-      - pip install -r python-code-pipeline/requirements.txt
-      
+      - echo "Installing dependencies"
+      - pip install -r requirements.txt
+
   build:
     commands:
-      - cd python-code-pipeline
-      - echo "building docker image"
-      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "DOCKER_REGISTRY_USERNAME" --password-stdin "$DOCKER_REGISTRY_URL"
-      - docker build -t "$DOCKER_REGISTRY_URL/DOCKER_REGISTRY_USERNAME/python-ci-project:latest" .
-      - docker push "$DOCKER_REGISTRY_URL/DOCKER_REGISTRY_USERNAME/python-ci-project:latest"
+      - echo "Building Docker image"
+      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+      - docker build -t $DOCKER_REGISTRY_USERNAME/python-ci-project:latest .
+      - docker push $DOCKER_REGISTRY_USERNAME/python-ci-project:latest
+
   post_build:
     commands:
       - echo "Build Success"
-      
