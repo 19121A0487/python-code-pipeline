@@ -2,9 +2,8 @@ version: 0.2
 
 env:
   variables:
-    DOCKER_REGISTRY_URL: "/my_app/docker-credentials/url"
-    DOCKER_REGISTRY_USERNAME: "/my_app/docker-credentials/username"
-    DOCKER_REGISTRY_PASSWORD: "/my_app/docker-credentials/password"
+    AWS_REGION: "us-east-1"
+    IMAGE_REPO_NAME: "python-code"
 
 phases:
   install:
@@ -15,14 +14,19 @@ phases:
     commands:
       - echo "Installing dependencies"
       - pip install -r requirements.txt
+      - echo "Logging in to Amazon ECR..."
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
     commands:
-      - echo "Building Docker image"
-      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
-      - docker build -t $DOCKER_REGISTRY_USERNAME/python-ci-project:latest .
-      - docker push $DOCKER_REGISTRY_USERNAME/python-ci-project:latest
+      - echo "Building Docker image..."
+      - docker build -t $IMAGE_REPO_NAME .
+      - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
 
   post_build:
     commands:
-      - echo "Build Success"
+      - echo "Pushing Docker image to ECR..."
+      - docker push $REPOSITORY_URI:latest
+      - echo "Build completed successfully"
